@@ -1,6 +1,7 @@
 #pragma once
 
 #include "edge.h"
+#include "propagate_decl.h"
 
 namespace nabu
 {
@@ -88,17 +89,14 @@ namespace nabu
             output.owner = this;
         }
         
-        inode_t&       in(int i)       {return inputs[i];}
-        const inode_t& in(int i) const {return inputs[i];}
+        inode_t&       in(const int& i)       {return inputs[i];}
+        const inode_t& in(const int& i) const {return inputs[i];}
+        onode_t& out() {return output;}
         const onode_t& out() const {return output;}
-        void propagate()
+        void set_input_state(const int& i, const state i_state)
         {
-            state output_state = compute_gate_output(gate_operation, inputs);
-            if (output_state != this->output.node_state)
-            {
-                this->output.node_state = output_state;
-                // this->output.propagate();
-            }
+            this->in(i) = i_state;
+            propagate(*this);
         }
     };
 }
