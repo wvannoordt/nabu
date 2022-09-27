@@ -29,9 +29,12 @@ namespace nabu
     struct edge_t
     {
         //Every edge has a unique control point that sets the state
-        onode_t* control;
+        onode_t* control = nullptr;
         std::vector<inode_t*> out;
-        void attach(onode_t& onode) {control = &onode;}
+        void attach(onode_t& onode)
+        {
+            control = &onode;
+        }
         void attach(inode_t& inode)
         {
             for (auto p: out)
@@ -39,6 +42,7 @@ namespace nabu
                 if (p == &inode) return;
             }
             out.push_back(&inode);
+            
         }
     };
 }
