@@ -9,7 +9,6 @@ namespace nabu
     static void propagate(edge_t& edge)
     {
         // print("edge");
-        bool dbg = edge.out.size()>1;
         for (auto n: edge.out)
         {
             if (n->node_state != edge.control->node_state)
