@@ -11,11 +11,12 @@ namespace nabu
         // print("edge");
         for (auto n: edge.out)
         {
-            if (n->node_state != edge.control->node_state)
-            {
+            //optimize later
+            // if (n->node_state != edge.control->node_state)
+            // {
                 n->node_state = edge.control->node_state;
                 propagate(*n);
-            }
+            // }
         }
     }
     
@@ -41,10 +42,11 @@ namespace nabu
     {
         // print("gate");
         state output_state = compute_gate_output(gate.gate_operation, gate.inputs);
-        if (output_state != gate.output.node_state)
-        {
+        //optimize later
+        // if (output_state != gate.output.node_state)
+        // {
             gate.output.node_state = output_state;
             propagate(gate.output);
-        }
+        // }
     }
 }
