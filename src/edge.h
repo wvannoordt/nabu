@@ -34,6 +34,7 @@ namespace nabu
         void attach(onode_t& onode)
         {
             control = &onode;
+            onode.edge = this;
         }
         void attach(inode_t& inode)
         {
@@ -41,8 +42,7 @@ namespace nabu
             {
                 if (p == &inode) return;
             }
-            out.push_back(&inode);
-            
+            out.push_back(&inode);            
         }
     };
 }
