@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include "edge.h"
 #include "propagate_decl.h"
 
@@ -7,11 +9,13 @@ namespace nabu
 {
     enum operation
     {
-        op_or,
-        op_and,
-        op_id,
-        op_inv
+        op_or  = 'o',
+        op_and = 'a',
+        op_id  = 'i',
+        op_inv = 'v'
     };
+    
+    using inputs_t = std::array<inode_t, 2>;
     
     int get_num_inputs(const operation& oper)
     {
@@ -25,26 +29,26 @@ namespace nabu
         }
     }
     
-    state compute_or (const std::vector<inode_t>& inputs)
+    state compute_or (const inputs_t& inputs)
     {
         if ((inputs[0]==bad_state) || (inputs[1] == bad_state)) return bad_state;
         if ((inputs[0]== on_state) || (inputs[1] ==  on_state)) return  on_state;
         return off_state;
     }
     
-    state compute_and(const std::vector<inode_t>& inputs)
+    state compute_and(const inputs_t& inputs)
     {
         if ((inputs[0]==bad_state) || (inputs[1] == bad_state)) return bad_state;
         if ((inputs[0]== on_state) && (inputs[1] ==  on_state)) return  on_state;
         return off_state;
     }
     
-    state compute_id (const std::vector<inode_t>& inputs)
+    state compute_id (const inputs_t& inputs)
     {
         return inputs[0].node_state;
     }
     
-    state compute_inv(const std::vector<inode_t>& inputs)
+    state compute_inv(const inputs_t& inputs)
     {
         if (inputs[0] == bad_state) return bad_state;
         if (inputs[0] == off_state) return  on_state;
@@ -52,7 +56,7 @@ namespace nabu
         return off_state;
     }    
     
-    state compute_gate_output(const operation& gate_operation, const std::vector<inode_t>& inputs)
+    state compute_gate_output(const operation& gate_operation, const inputs_t& inputs)
     {
         switch (gate_operation)
         {
@@ -68,7 +72,7 @@ namespace nabu
     {
         operation gate_operation;
         onode_t output;
-        std::vector<inode_t> inputs;
+        inputs_t inputs;
         gate_t(){}
         gate_t(const operation& gate_operation_in)
         {
@@ -79,7 +83,6 @@ namespace nabu
         void init_endpoints()
         {
             int num_inputs = get_num_inputs(gate_operation);
-            inputs.resize(num_inputs);
             for (auto& x: inputs)
             {
                 x.node_state = off_state;
@@ -88,6 +91,8 @@ namespace nabu
             output.node_state = off_state;
             output.owner = this;
         }
+        
+        operation get_op() const {return gate_operation;}
         
         inode_t&       in(const int& i)       {return inputs[i];}
         const inode_t& in(const int& i) const {return inputs[i];}

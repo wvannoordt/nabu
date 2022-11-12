@@ -18,6 +18,8 @@ namespace nabu
             return *this;
         }
         bool operator == (const state& state_in) const {return state_in == node_state;}
+        state get_state() const {return node_state;}
+        void  set_state(const state& st) {node_state = st;}
     };
     
     template <const node_type n_type> static std::ostream & operator<<(std::ostream & os, const node_t<n_type>& st)
@@ -44,5 +46,6 @@ namespace nabu
             }
             out.push_back(&inode);            
         }
+        state get_state() const {return control->node_state;}
     };
 }
