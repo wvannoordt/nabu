@@ -54,7 +54,15 @@ namespace nabu
         if (inputs[0] == off_state) return  on_state;
         if (inputs[0] ==  on_state) return off_state;
         return off_state;
-    }    
+    }
+    
+    state inverse(const state& input)
+    {
+        if (input == bad_state) return  on_state; //temporary!
+        if (input == off_state) return  on_state;
+        if (input ==  on_state) return off_state;
+        return bad_state;
+    }
     
     state compute_gate_output(const operation& gate_operation, const inputs_t& inputs)
     {
@@ -85,10 +93,10 @@ namespace nabu
             int num_inputs = get_num_inputs(gate_operation);
             for (auto& x: inputs)
             {
-                x.node_state = off_state;
+                x.node_state = get_default_ctr_state();
                 x.owner = this;
             }
-            output.node_state = off_state;
+            output.node_state = get_default_ctr_state();
             output.owner = this;
         }
         
@@ -102,6 +110,10 @@ namespace nabu
         {
             this->in(i) = i_state;
             propagate(*this);
+        }
+        void toggle_input (const int& i)
+        {
+            set_input_state(i, inverse(inputs[i].node_state));
         }
     };
 }

@@ -7,11 +7,16 @@
 
 namespace nabu
 {
+    static constexpr state get_default_ctr_state()
+    {
+        return bad_state;
+    }
+    
     template <const node_type n_type> struct node_t
     {
         gate_t* owner = nullptr;
         edge_t* edge  = nullptr;
-        state node_state = off_state;
+        state node_state = get_default_ctr_state();
         node_t& operator =(const state& state_in)
         {
             node_state = state_in;
@@ -44,7 +49,7 @@ namespace nabu
             {
                 if (p == &inode) return;
             }
-            out.push_back(&inode);            
+            out.push_back(&inode);
         }
         state get_state() const {return control->node_state;}
     };
