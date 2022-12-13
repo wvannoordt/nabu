@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <map>
+#include <algorithm>
+#include <array>
 
 #include "gate.h"
 #include "edge.h"
@@ -76,6 +78,67 @@ namespace nabu
             gate->set_input_state(id, i_state);
         }
         
+        void compute_maps()
+        {
+            gate_ids.clear();
+            edge_ids.clear();
+            for (int i = 0; i < gates.size(); ++i)
+            {
+                gate_ids.insert({gates[i], i});
+            }
+            for (int i = 0; i < edges.size(); ++i)
+            {
+                edge_ids.insert({edges[i], i});
+            }
+        }
+        
+        std::array<std::pair<edge_t*, bool>, 3> remove(gate_t* gate)
+        {
+            std::array<std::pair<edge_t*, bool>, 3> output;
+            int id = gate_ids.at(gate);
+            if (gate->output.edge != nullptr) gate->output.edge->control = nullptr;
+            
+            //we have to now destroy the edge that connected the output
+            output[0].first  = gate->output.edge;
+            output[0].second = gate->output.edge != nullptr; //true indicates invalid state
+            for (int i = 0; i < 2; ++i)
+            {
+                inode_t* input = &gate->inputs[i];
+                edge_t* in_edge = input->edge;
+                output[1+i].first  = in_edge;
+                output[1+i].second = false;
+                if (in_edge != nullptr)
+                {
+                    auto it1 = std::find(in_edge->out.begin(), in_edge->out.end(), input);
+                    in_edge->out.erase(it1);
+                    output[1+i].second = in_edge->out.size() == 0;
+                }
+            }
+            
+            auto it = gates.begin() + id;
+            gates.erase(it);
+            auto it2 = gate_ids.find(gate);
+            gate_ids.erase(it2);
+            
+            delete gate;
+            compute_maps();
+            return output;
+        }
+        
+        void remove(edge_t* edge)
+        {
+            //problem, the edge ids actually have to update every time we remove an edge! same with gates.
+            int id = edge_ids.at(edge);
+            auto it1 = edges.begin() + id;
+            edges.erase(it1);
+            auto it2 = edge_ids.find(edge);
+            if (it2 != edge_ids.end()) edge_ids.erase(it2);
+            if (edge->control != nullptr) edge->control->edge = nullptr;
+            for (auto o: edge->out) o->edge = nullptr;
+            delete edge;
+            compute_maps();
+        }
+        
         void clear()
         {
             for (auto g: gates) delete g;
@@ -84,8 +147,12 @@ namespace nabu
             edges.clear();
             inputs.clear();
             outputs.clear();
+            edge_ids.clear();
+            gate_ids.clear();
         }
         
+        std::vector<gate_t*>& get_gates() {return gates;}
+        std::vector<edge_t*>& get_edges() {return edges;}
         const std::vector<gate_t*>& get_gates() const {return gates;}
         const std::vector<edge_t*>& get_edges() const {return edges;}
         

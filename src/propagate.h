@@ -12,11 +12,11 @@ namespace nabu
         for (auto n: edge.out)
         {
             //optimize later
-            // if (n->node_state != edge.control->node_state)
-            // {
+            if (n->node_state != edge.control->node_state)
+            {
                 n->node_state = edge.control->node_state;
                 propagate(*n);
-            // }
+            }
         }
     }
     

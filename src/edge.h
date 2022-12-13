@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <algorithm>
 
 #include "state.h"
 #include "propagate_decl.h"
@@ -50,6 +51,17 @@ namespace nabu
                 if (p == &inode) return;
             }
             out.push_back(&inode);
+            inode.edge = this;
+        }
+        bool detach(inode_t& inode)
+        {
+            auto it = std::find(out.begin(), out.end(), &inode);
+            if(it != out.end())
+            {
+                inode.edge = nullptr;
+                out.erase(it);
+            }
+            return (out.size() == 0);
         }
         state get_state() const {return control->node_state;}
     };
