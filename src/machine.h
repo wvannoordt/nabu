@@ -139,6 +139,17 @@ namespace nabu
             compute_maps();
         }
         
+        void refresh()
+        {
+            for (auto g: gates)
+            {
+                for (int i = 0; i < 2; ++i)
+                {
+                    if (g->in(i).edge == nullptr) g->set_input_state(i, state::off_state);
+                }
+            }
+        }
+        
         void clear()
         {
             for (auto g: gates) delete g;
